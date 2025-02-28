@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timetable Cards</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
    <link rel="stylesheet" href="more.css">
 </head>
 <body class="bg-gray-100 flex justify-center items-center min-h-screen">
@@ -69,8 +71,9 @@
                 </svg>
             </button>
             <div class="text-center">
+                <input type="text" id="lectureId" placeholder="Enter Lecture ID">
                 <button onclick="generateQRCode()" class="bg-fuchsia-900 text-white px-4 py-2 rounded-lg shadow">QR Generator</button>
-                <div id="qrCodeContainer" class="mt-4"></div>
+                <div id="qrcode" class="mt-4"></div>
             </div>
         </div>
          <div class="w-full flex justify-center">
@@ -134,7 +137,14 @@
             });
         });
             
-            
+        function generateQRCode() {
+            let lectureId = document.getElementById("lectureId").value;
+            let qrData = JSON.stringify({ lectureId: lectureId, timestamp: Date.now() });
+
+            document.getElementById("qrcode").innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), qrData);
+}
+ 
 
         function showPopup() {
         document.getElementById("popupModal").classList.remove("hidden");
@@ -188,14 +198,6 @@ function initializeStudentList() {
 }
 
 
-
-
-
-
-
-
-
-
 function deleteLecture(button) {
         const card = button.closest('.relative').querySelector('.card');
         if (card) {
@@ -226,15 +228,6 @@ function deleteLecture(button) {
     document.addEventListener('DOMContentLoaded', updateScheduleDates);
 
 
-
-    
-   
-
-
-
-
-
-
         // Toggle Student List Dropdown
         function toggleStudentList(id) {
             document.getElementById(id).classList.toggle('hidden');
@@ -254,14 +247,6 @@ function deleteLecture(button) {
             }
             updateCounts();
         }
-        function generateQRCode() {
-    const qrContainer = document.getElementById("qrCodeContainer");
-    const qrData = "Attendance Marking Link";  // Replace with actual data if needed
-    const qrSize = 200;  // Adjust size as needed
-    const qrURL = `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodeURIComponent(qrData)}`;
-
-    qrContainer.innerHTML = `<img src="${qrURL}" alt="QR Code" class="rounded-lg shadow-lg">`;
-}
 
 
         // Update Present/Absent Student Count
