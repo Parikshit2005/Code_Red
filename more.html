@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+   <link rel="stylesheet" href="more.css">
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div id="mainPage" class="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl border border-gray-300 min-h-screen">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">My Schedule</h2>
+        <div class="grid grid-cols-5 gap-4 text-center mb-4">
+            
+             <div class="p-4 bg-gradient-to-r from-fuchsia-900 to-fuchsia-900  text-white font-bold rounded-lg shadow-md">
+                 <br> <span id="MondayDate">19 Feb</span>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-fuchsia-900 to-fuchsia-900  text-white font-bold rounded-lg shadow-md">
+                 <br> <span id="TuesdayDate">20 Feb</span>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-fuchsia-900 to-fuchsia-900  text-white font-bold rounded-lg shadow-md">
+                 <br> <span id="WednesdayDate">21 Feb</span>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-fuchsia-900 to-fuchsia-900 text-white font-bold rounded-lg shadow-md">
+              <br> <span id="ThursdayDate">22 Feb</span>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-fuchsia-900 to-fuchsia-900 text-white font-bold rounded-lg shadow-md">
+              <br> <span id="FridayDate">23 Feb</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-5 gap-4">
+            <script>
+                const schedule = [
+                    ["TOC", "SQL", "WT"],
+                    ["WT", "SQL", "TOC"],
+                    ["TOC", "DE", "SQL"],
+                    ["SQL", "TOC", "WT"],
+                    ["TOC", "WT", "OFF"]
+                   
+                ];
+                const times = ["9:00 AM - 10:00 AM", "10:15 AM - 11:15 AM", "11:30 AM - 12:30 PM"];
+                document.write(schedule.map(day => `<div class='space-y-4'>` + day.map((subject, index) => `
+                    <div class='relative'>
+                        <div onclick='toggleDropdown(this)' class='card p-4 bg-white text-center shadow-lg rounded-lg border border-gray-300 cursor-pointer'>
+                            <div class='font-semibold text-gray-700'>${subject}</div>
+                            <div class='text-sm text-gray-500'>${times[index]}</div>
+                        </div>
+                        <div class='dropdown hidden absolute left-0 mt-2 w-48 shadow-md rounded-lg border border-gray-300 z-10'>
+                            <ul>
+                                <li class='px-4 py-2 cursor-pointer' onclick='openAttendancePage(this.closest(".relative"))'>Mark Attendance</li>
+
+                               
+                                <li class='px-4 py-2 cursor-pointer'>Update Attendance</li>
+                               <li class='px-4 py-2 cursor-pointer' onclick='deleteLecture(this)'>Delete Lecture</li>
+
+                            </ul>
+                        </div>
+                    </div>`).join('') + `</div>`).join(''));
+            </script>
+        </div>
+    </div>
+
+    <div id="attendancePage" class="hidden bg-white shadow-lg rounded-lg p-10 w-full max-w-6xl border border-gray-300 min-h-screen">
+        <div class="flex justify-between items-center mb-4">
+            <!-- <button onclick="goBack()" class="bg-gray-200 px-4 py-2 rounded-lg shadow">Back</button> -->
+            <button onclick="goBack()" class="bg-fuchsia-900 hover:bg-fuchsia-700 text-white p-3 rounded-full shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <div class="text-center">
+                <button onclick="generateQRCode()" class="bg-fuchsia-900 text-white px-4 py-2 rounded-lg shadow">QR Generator</button>
+                <div id="qrCodeContainer" class="mt-4"></div>
+            </div>
+        </div>
+         <div class="w-full flex justify-center">
+            <div class="text-center">
+                <p class="text-xl font-bold"><strong>Subject:</strong> <span id="facultySubject"></span></p>
+                <p class="text-xl font-bold"><strong>Section:</strong> B</p>
+                <p class="text-xl font-bold"><strong>Time:</strong> <span id="facultyTime"></span></p>
+            </div>
+        </div>
+        <!-- Attendance Cards -->
+        <div class="grid grid-cols-3 gap-6 text-center mb-6">
+
+            <!-- Total Students Card -->
+            <div class="p-6 bg-gray-200 rounded-lg shadow-md animated-card relative cursor-pointer" onclick="toggleStudentList('totalList')">
+                <div class="text-lg font-bold">Total Students</div>
+                <div class="text-2xl">10</div>
+                <div id="totalList" class="absolute bg-white shadow-lg rounded-lg p-4 w-72 left-0 mt-2 hidden">
+                    <ul id="totalStudents"></ul>
+                </div>
+            </div>
+    
+            <!-- Present Students Card -->
+            <div class="p-6 bg-green-200 rounded-lg shadow-md animated-card relative cursor-pointer" onclick="toggleStudentList('presentList')">
+                <div class="text-lg font-bold">Present Students</div>
+                <div class="text-2xl" id="presentCount">0</div>
+                <div id="presentList" class="absolute bg-white shadow-lg rounded-lg p-4 w-72 left-0 mt-2 hidden">
+                    <ul id="presentStudents"></ul>
+                </div>
+            </div>
+    
+            <!-- Absent Students Card -->
+            <div class="p-6 bg-red-200 rounded-lg shadow-md animated-card relative cursor-pointer" onclick="toggleStudentList('absentList')">
+                <div class="text-lg font-bold">Absent Students</div>
+                <div class="text-2xl" id="absentCount">0</div>
+                <div id="absentList" class="absolute bg-white shadow-lg rounded-lg p-4 w-72 left-0 mt-2 hidden">
+                    <ul id="absentStudents"></ul>
+                </div>
+            </div>
+        </div>
+       
+        <button onclick="showPopup()" class="w-1/4 bg-fuchsia-900 text-white py-2 rounded-lg shadow mt-40 block mx-auto">Submit</button>
+    </div>
+    <div id="popupModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <p class="text-lg font-semibold text-gray-800">Attendance has been marked successfully!</p>
+            <button onclick="closePopup()" class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg">OK</button>
+        </div>
+    </div>
+    
+    <script>
+        function toggleDropdown(card) {
+            const dropdown = card.nextElementSibling;
+            dropdown.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                if (!dropdown.previousElementSibling.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+            
+            
+
+        function showPopup() {
+        document.getElementById("popupModal").classList.remove("hidden");
+    }
+
+    function closePopup() {
+        document.getElementById("popupModal").classList.add("hidden");
+        document.getElementById("attendancePage").classList.add("hidden");
+        document.getElementById("mainPage").classList.remove("hidden");
+    }
+    function openAttendancePage(card) {
+    const subject = card.querySelector('.font-semibold').textContent;
+    const time = card.querySelector('.text-sm').textContent;
+
+    document.getElementById("facultySubject").textContent = subject;
+    document.getElementById("facultyTime").textContent = time;
+
+    document.getElementById("mainPage").classList.add("hidden");
+    document.getElementById("attendancePage").classList.remove("hidden");
+}
+
+        function goBack() {
+            document.getElementById("attendancePage").classList.add("hidden");
+            document.getElementById("mainPage").classList.remove("hidden");
+        }
+
+        const students = ["Ram", "karan", "siya", "khushi", "payal", "aditiya", "rohan", "riya", "saniya", "naman"];
+        const totalList = document.getElementById('totalStudents');
+        const presentList = document.getElementById('presentStudents');
+        const absentList = document.getElementById('absentStudents');
+        const presentCount = document.getElementById('presentCount');
+        const absentCount = document.getElementById('absentCount');
+
+     
+function initializeStudentList() {
+    students.forEach((student) => {
+        // Create the list item without a checkbox for Total Students
+        const li = document.createElement('li');
+        li.textContent = student; // Only the name for the total list
+        totalList.appendChild(li.cloneNode(true));
+
+        // Create the list item with a checkbox for Absent Students
+        const liWithCheckbox = document.createElement('li');
+        liWithCheckbox.classList.add('flex', 'items-center', 'space-x-2'); // Flexbox for alignment
+        liWithCheckbox.innerHTML = `<input type='checkbox' onchange='updateAttendance(this)'> <span>${student}</span>`;
+
+        // Append to Absent Students list
+        absentList.appendChild(liWithCheckbox);
+    });
+    updateCounts();
+}
+
+
+
+
+
+
+
+
+
+
+function deleteLecture(button) {
+        const card = button.closest('.relative').querySelector('.card');
+        if (card) {
+            card.querySelector('.font-semibold').textContent = "--"; // Replace with dashes
+        }
+    }
+
+   
+    // Function to format date as "Day Month Date"
+    function formatDate(date) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    // Function to update schedule dates
+    function updateScheduleDates() {
+        const today = new Date();
+        const startOfWeek = today.getDate() - today.getDay() + 1; // Get the Monday of the current week
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+        for (let i = 0; i < days.length; i++) {
+            const date = new Date(today.setDate(startOfWeek + i));
+            document.getElementById(`${days[i]}Date`).textContent = formatDate(date);
+        }
+    }
+
+    // Call the function to set the dates on page load
+    document.addEventListener('DOMContentLoaded', updateScheduleDates);
+
+
+
+    
+   
+
+
+
+
+
+
+        // Toggle Student List Dropdown
+        function toggleStudentList(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+       
+
+        // Update Attendance Based on Checkbox
+        function updateAttendance(checkbox) {
+            const studentName = checkbox.parentElement;
+
+            if (checkbox.checked) {
+                absentList.removeChild(studentName);
+                presentList.appendChild(studentName);
+            } else {
+                presentList.removeChild(studentName);
+                absentList.appendChild(studentName);
+            }
+            updateCounts();
+        }
+        function generateQRCode() {
+    const qrContainer = document.getElementById("qrCodeContainer");
+    const qrData = "Attendance Marking Link";  // Replace with actual data if needed
+    const qrSize = 200;  // Adjust size as needed
+    const qrURL = `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodeURIComponent(qrData)}`;
+
+    qrContainer.innerHTML = `<img src="${qrURL}" alt="QR Code" class="rounded-lg shadow-lg">`;
+}
+
+
+        // Update Present/Absent Student Count
+        function updateCounts() {
+            presentCount.textContent = presentList.children.length;
+            absentCount.textContent = absentList.children.length;
+        }
+
+        // Load Student List on Page Load
+        document.addEventListener('DOMContentLoaded', initializeStudentList);
+    </script>
+
+</body>
+</html>
+

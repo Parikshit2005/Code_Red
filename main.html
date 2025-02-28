@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> QR Attendence System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body onclick="closeDropdowns(event)">
+
+    <!-- Header -->
+    <header class="header">
+        <button onclick="toggleSidebar()" class="text-2xl font-bold">☰</button>
+        <div class="logo flex items-center space-x-2">
+            
+            <img src="" alt="logo" class="w-10 h-10">
+            <span class="text-4xl font-bold">Code_<span class="text-white-500 bounce">R</span>ed</span>
+
+            
+        </div>
+        <div class="profile">
+            <button class="profile-btn" onclick="openProfile()">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA51Hk-IxsWTIv0ruG1KzaLkbulzIqG0Kk_Q&s" alt="Profile Picture">
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="menu-item" onclick="switchContent('dashboard')">
+            <span class="menu-icon text-2xl">🏠</span> <span class="text-xl ms-6">Dashboard</span>
+        </div>
+
+        <!-- Attendance Dropdown -->
+        <div class="menu-item" onclick="toggleDropdown(event, 'attendance-dropdown')">
+            <span class="menu-icon text-2xl">📅</span> <span class="text-xl ms-6">Attendance</span>
+        </div>
+        <div class="dropdown-box" id="attendance-dropdown">
+            <div class="submenu-item" alignment onclick="switchContent('more.html') "> My Calender</div>
+        </div>
+
+        <!-- Report Dropdown -->
+        <!-- <div class="menu-item" onclick="toggleDropdown(event, 'report-dropdown')">
+            <span class="menu-icon text-2xl">📊</span> <span class="text-xl ms-6">Report</span>
+        </div> -->
+        <!-- <div class="dropdown-box" id="report-dropdown">
+            <div class="submenu-item" onclick="switchContent('daily-report')">Daily Report</div>
+            <div class="submenu-item" onclick="switchContent('monthlyreport.html')"> Monthly Report</div>
+        </div> -->
+    </div>
+    <!-- Dynamic Content -->
+    <div class="content" id="content">
+        <h2 class="text-2xl font-bold">🏠 Dashboard</h2>
+        <p>Welcome to dashboard!</p>
+
+        <!-- Announcements Section -->
+        <div class="section">
+            <h2>📢 Announcements</h2>
+            <textarea class="textarea" placeholder="Write your announcement here..."></textarea>
+            <button class="button mt-2">Upload</button>
+        </div>
+
+        <!-- Assignments Section -->
+        <div class="section">
+            <h2>📚 Assignments</h2>
+
+                    <!-- Custom Attach PDF Section -->
+            <!-- Textarea for assignment -->
+            <textarea class="textarea" id="assignment-text" placeholder="Write your assignment here..."></textarea>
+
+            <!-- Custom Attach PDF Section -->
+            <div class="mt-2">
+                <label for="assignment-file" class="text-sm font-medium text-gray-700">PDF</label>
+                
+                <!-- Hidden File Input -->
+                <input type="file" id="assignment-file" accept=".pdf" class="hidden" onchange="updateFileName()">
+                
+                <!-- Custom Styled File Button -->
+                <button type="button" onclick="document.getElementById('assignment-file').click();" class="button mt-2">
+                    Choose File
+                </button>
+                
+                <!-- Display File Name -->
+                <span id="file-name" class="text-sm text-gray-600 mt-1 block"></span>
+            </div>
+            <button class="button mt-2">Post</button>
+        </div>
+
+    </div>
+
+    <!-- Profile Popup -->
+    <div class="profile-popup" id="profile-popup">
+        <button class="popup-close" onclick="closeProfile()">X</button>
+        <div class="profile-info">
+            <p><strong>Name:</strong> Saavari</p>
+            <p><strong>Email:</strong> Saavari@gmail.com</p>
+            <p><strong>Role:</strong> Faculty</p>
+        </div>
+        <div class="profile-option">
+            <button onclick="openChangePassword()">Change Password</button>
+        </div>
+        <!-- <div class="profile-option" onclick="openSettings()">Sign Out</div>
+    </div> -->
+    <div class="profile-option">
+        <button onclick="openSettings()">Sign Out</button>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+            // Function to toggle the sidebar collapsed/expanded state
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("collapsed");
+
+    // Close all dropdowns if sidebar is collapsed
+    if (sidebar.classList.contains('collapsed')) {
+        document.querySelectorAll('.dropdown-box').forEach(box => {
+            box.classList.remove('active');
+        });
+    }
+}
+
+// Function to handle dropdown toggle and auto-expand sidebar
+function toggleDropdown(event, id) {
+    event.stopPropagation();
+
+    // Expand the sidebar if collapsed
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('collapsed')) {
+        sidebar.classList.remove('collapsed');
+    }
+
+    document.querySelectorAll('.dropdown-box').forEach(box => {
+        if (box.id !== id) box.classList.remove('active');
+    });
+    document.getElementById(id).classList.toggle("active");
+}
+
+     function switchContent(page) {
+            let content = document.getElementById("content");
+
+            if (page === "dashboard" || page === "loading") {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold">🏠 ${page.charAt(0).toUpperCase() + page.slice(1)}</h2>
+                    <p>Welcome to ${page}!</p>
+
+                    <!-- Announcements Section -->
+                    <div class="section">
+                        <h2>📢 Announcements</h2>
+                        <textarea class="textarea" placeholder="Write your announcement here..."></textarea>
+                        <button class="button mt-2">Upload</button>
+                    </div>
+
+                    <!-- Assignments Section -->
+                    <div class="section">
+                        <h2>📚 Assignments</h2>
+                        
+                        <!-- Textarea for assignment -->
+                        <textarea class="textarea" id="assignment-text" placeholder="Write your assignment here..."></textarea>
+
+                        <!-- Custom Attach PDF Section -->
+                        <div class="mt-2">
+                            <label for="assignment-file" class="text-sm font-medium text-gray-700">PDF</label>
+                            
+                            <!-- Hidden File Input -->
+                            <input type="file" id="assignment-file" accept=".pdf" class="hidden" onchange="updateFileName()">
+                            
+                            <!-- Custom Styled File Button -->
+                            <button type="button" onclick="document.getElementById('assignment-file').click();" class="button mt-2">
+                                Choose File
+                            </button>
+                            
+                            <!-- Display File Name -->
+                            <span id="file-name" class="text-sm text-gray-600 mt-1 block"></span>
+                        </div>
+                        
+                        <button class="button mt-2">Post</button>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `<iframe src="${page}" style="width:100%; height:85vh; border:none;"></iframe>`;
+            }
+
+            closeDropdowns();
+        }
+          
+
+        function openProfile() {
+            document.getElementById('profile-popup').classList.add('active');
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closeProfile() {
+            document.getElementById('profile-popup').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+   function updateFileName() {
+        var fileInput = document.getElementById('assignment-file');
+        var fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file chosen';
+        
+        // Update the file name in the span below the button
+        document.getElementById('file-name').textContent = fileName;
+
+        // Set the file name in the textarea
+        var textArea = document.getElementById('assignment-text');
+        textArea.value = "Attached PDF: " + fileName;  // You can adjust the format here
+    }
+</script>
+</body>
+</html>

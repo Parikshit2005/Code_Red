@@ -1,0 +1,26 @@
+ /* Hover Animation */
+ .card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+.dropdown {
+    background: #854f6c;
+    color: white;
+}
+.dropdown ul li:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.animated-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.animated-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#totalList, #presentList, #absentList {
+    width: 100%; /* Matches the parent button */
+    margin-top: 40px; /* Added margin to move the dropdown list down */
+    background: #854f6c;
+    color: white;
+}
